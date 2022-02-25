@@ -9,6 +9,7 @@ from app import app
 from flask import render_template, request, redirect, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
 from .forms import UploadForm
+from flask.helpers import send_from_directory
 
 
 ###
@@ -47,6 +48,33 @@ def upload():
 
     return render_template('upload.html', form = upload_form)
 
+def get_uploaded_images():
+
+    photos = list()
+    rootdir = os.path.join(app.config['UPLOAD_FOLDER'])
+
+    for subdir, dirs, files in os.walk(rootdir):
+
+        for file in files:
+            photos.append(file)
+
+    return photos
+
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    rootdir = os.getcwd()
+    return  send_from_directory(os.path.join(rootdir, app.config['UPLOAD_FOLDER']), filename)
+
+
+    
+@app.route('/files')
+def files():
+
+    # Makes it only accessible to users who are logged in.
+
+    photos = get_uploaded_images()
+
+    return render_template('files.html', photos = photos)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
