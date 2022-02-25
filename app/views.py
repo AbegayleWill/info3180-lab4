@@ -69,8 +69,8 @@ def get_image(filename):
     
 @app.route('/files')
 def files():
-
-    # Makes it only accessible to users who are logged in.
+    if not session.get('logged_in'):
+        abort(401)
 
     photos = get_uploaded_images()
 
